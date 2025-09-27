@@ -16,6 +16,10 @@ export const subjectsColors = {
   economics: "#C8FFDF",
 };
 
+export function getSubjectColor(subject: string): string {
+  return subjectsColors[subject as keyof typeof subjectsColors] || "#CCCCCC";
+}
+
 export const voices = {
   male: { casual: "2BJW5coyhAzSr8STdHbE", formal: "c6SfcYrb2t09NHXiT80T" },
   female: { casual: "ZIlrSGI4jZqobxRKprJz", formal: "sarah" },
