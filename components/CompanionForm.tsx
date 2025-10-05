@@ -1,5 +1,6 @@
 "use client"
 
+import { createCompanion } from "@/lib/actions/companion.action"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
@@ -22,6 +23,7 @@ import {
 } from "@/components/ui/select"
 import {subjects} from "@/constants";
 import {Textarea} from "@/components/ui/textarea";
+import { useRouter } from "next/navigation"
 
 export const formSchema = z.object({
     name: z.string().min(1, { message: 'Companion is required.'}),
@@ -42,19 +44,31 @@ type FormValues = {
 
 
 const CompanionForm = () => {
-   const form = useForm<FormValues>({
-  resolver: zodResolver(formSchema),
-  defaultValues: {
-    name: "",
-    subject: "",
-    topic: "",
-    voice: "",
-    style: "",
-  },
-});
+    const router = useRouter();
+    const form = useForm<FormValues>({
+        resolver: zodResolver(formSchema),
+        defaultValues: {
+            name: "",
+            subject: "",
+            topic: "",
+            voice: "",
+            style: "",
+        },
+    });
 
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
-        console.log(values)
+        // Add a default duration value (e.g., 0 or any appropriate number)
+        const companion = await createCompanion({
+            ...values,
+            duration: 0, // Set a default or collect from user input if needed
+        });
+
+        if (companion) {
+            router.push(`/companions/${companion.id}`);
+        } else {
+            console.log("Failed to create companion");
+            router.push('/');
+        }
     }
 
     return (
