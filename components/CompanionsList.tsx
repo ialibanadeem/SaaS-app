@@ -41,7 +41,7 @@ const CompanionsList = ({
             <TableRow key={id}>
               <TableCell>
                 <Link href={`/companions/${id}`}>
-                  {subject}
+                
                   <div className="flex items-center gap-2">
                     <div
                       className="size-[72px] flex items-center justify-center rounded-lg max-md:hidden"

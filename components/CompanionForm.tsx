@@ -1,6 +1,5 @@
 "use client"
 
-import { createCompanion } from "@/lib/actions/companion.action"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
@@ -23,51 +22,39 @@ import {
 } from "@/components/ui/select"
 import {subjects} from "@/constants";
 import {Textarea} from "@/components/ui/textarea";
-import { useRouter } from "next/navigation"
+import {createCompanion} from "@/lib/actions/companion.action";
+import {redirect} from "next/navigation";
 
-export const formSchema = z.object({
+const formSchema = z.object({
     name: z.string().min(1, { message: 'Companion is required.'}),
     subject: z.string().min(1, { message: 'Subject is required.'}),
     topic: z.string().min(1, { message: 'Topic is required.'}),
     voice: z.string().min(1, { message: 'Voice is required.'}),
     style: z.string().min(1, { message: 'Style is required.'}),
+    duration: z.coerce.number().min(1, { message: 'Duration is required.'}),
 })
 
-
-type FormValues = {
-  name: string;
-  subject: string;
-  topic: string;
-  voice: string;
-  style: string;
-};
-
-
 const CompanionForm = () => {
-    const router = useRouter();
-    const form = useForm<FormValues>({
-        resolver: zodResolver(formSchema),
+    const form = useForm<z.infer<typeof formSchema>>({ //@ts-expected-error sdgsdg efdsdf
+        resolver: zodResolver(formSchema) as any,
         defaultValues: {
-            name: "",
-            subject: "",
-            topic: "",
-            voice: "",
-            style: "",
+            name: '',
+            subject: '',
+            topic: '',
+            voice: '',
+            style: '',
+            duration: 15,
         },
-    });
+    })
 
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
-        // Add a default duration value (e.g., 0 or any appropriate number)
-        const companion = await createCompanion({
-            ...values,
-            duration: 0, // Set a default or collect from user input if needed
-        });
+        const companion = await createCompanion(values);
 
-        if (companion) {
-            router.push(`/companions/${companion.id}`);
+        if(companion) {
+            redirect(`/companions/${companion.id}`);
         } else {
-            console.log("Failed to create companion");
-            router.push('/');
+            console.log('Failed to create a companion');
+            redirect('/');
         }
     }
 
@@ -204,7 +191,24 @@ const CompanionForm = () => {
                     )}
                 />
 
-            
+                <FormField
+                    control={form.control}
+                    name="duration"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Estimated session duration in minutes</FormLabel>
+                            <FormControl>
+                                <Input
+                                    type="number"
+                                    placeholder="15"
+                                    {...field}
+                                    className="input"
+                                />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
                 <Button type="submit" className="w-full cursor-pointer">Build Your Companion</Button>
             </form>
         </Form>
