@@ -2,6 +2,8 @@
 
 import { auth } from "@clerk/nextjs/server";
 import { createSupabaseClient } from "@/lib/supabase";
+import { revalidatePath } from "next/cache";
+
 
 export const createCompanion = async (formData: CreateCompanion) => {
   const { userId: author } = await auth();
@@ -102,7 +104,7 @@ export const getUserSessions = async (userId: string, limit = 10) => {
 export const getUserCompanions = async (userId: string) => {
     const supabase = createSupabaseClient();
     const { data, error } = await supabase
-        .from('companions')
+        .from('Companion')
         .select()
         .eq('author', userId)
 
@@ -126,7 +128,7 @@ export const newCompanionPermissions = async () => {
     }
 
     const { data, error } = await supabase
-        .from('companions')
+        .from('Companion')
         .select('id', { count: 'exact' })
         .eq('author', userId)
 
@@ -139,4 +141,50 @@ export const newCompanionPermissions = async () => {
     } else {
         return true;
     }
-}
+} 
+export const addBookmark = async (companionId: string, path: string) => {
+  const { userId } = await auth();
+  if (!userId) return;
+  const supabase = createSupabaseClient();
+  const { data, error } = await supabase.from("bookmarks").insert({
+    companion_id: companionId,
+    user_id: userId,
+  });
+  if (error) {
+    throw new Error(error.message);
+  }
+  // Revalidate the path to force a re-render of the page
+
+  revalidatePath(path);
+  return data;
+};
+
+export const removeBookmark = async (companionId: string, path: string) => {
+  const { userId } = await auth();
+  if (!userId) return;
+  const supabase = createSupabaseClient();
+  const { data, error } = await supabase
+    .from("bookmarks")
+    .delete()
+    .eq("companion_id", companionId)
+    .eq("user_id", userId);
+  if (error) {
+    throw new Error(error.message);
+  }
+  revalidatePath(path);
+  return data;
+};
+
+// It's almost the same as getUserCompanions, but it's for the bookmarked companions
+export const getBookmarkedCompanions = async (userId: string) => {
+  const supabase = createSupabaseClient();
+  const { data, error } = await supabase
+    .from("bookmarks")
+    .select(`companions:companion_id (*)`) // Notice the (*) to get all the companion data
+    .eq("user_id", userId);
+  if (error) {
+    throw new Error(error.message);
+  }
+  // We don't need the bookmarks data, so we return only the companions
+  return data.map(({ companions }) => companions);
+};

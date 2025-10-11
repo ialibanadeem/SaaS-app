@@ -44,8 +44,9 @@ const CompanionComponent = ({
 
   useEffect(() => {
     const onCallStart = () => setCallStatus(CallStatus.ACTIVE);
-    const onCallEnd = () => setCallStatus(CallStatus.FINISHED);
-
+    const onCallEnd = () => {
+        setCallStatus(CallStatus.FINISHED);
+    }
     const onMessage = (message: any) => {
       console.log("VAPI message received:", message);
 
