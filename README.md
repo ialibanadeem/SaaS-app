@@ -1,8 +1,8 @@
 
-```markdown
+
 # 🎙️ Converso LMS - SaaS App
 
-**Live Demo:** [https://saa-s-app-puce.vercel.app/](https://saa-s-app-puce.vercel.app/)
+**Live Demo:** (https://saa-s-app-puce.vercel.app/)
 
 An interactive conversational AI web application that lets users create, manage, and talk to custom AI companions.  
 Built with **Next.js**, **Supabase**, **Clerk**, and **TailwindCSS**, deployed on **Vercel**.
@@ -40,7 +40,7 @@ Built with **Next.js**, **Supabase**, **Clerk**, and **TailwindCSS**, deployed o
    ```bash
    git clone https://github.com/yourusername/your-repo.git
    cd your-repo
-   ```
+  
 
 2. **Install dependencies**
 
