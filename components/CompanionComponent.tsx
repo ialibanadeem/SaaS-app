@@ -1,12 +1,13 @@
 "use client";
-
+import { vapi } from "@/lib/vapi.sdk";
 import { useEffect, useRef, useState } from "react";
 import { cn, configureAssistant, getSubjectColor } from "@/lib/utils";
-import { vapi } from "@/lib/vapi.sdk";
 import Image from "next/image";
 import Lottie, { LottieRefCurrentProps } from "lottie-react";
 import soundwaves from "@/constants/soundwaves.json";
 import { AnimatePresence, motion } from "framer-motion";
+import { useLanguage } from "@/app/context/LanguageContext";
+
 
 enum CallStatus {
   INACTIVE = "INACTIVE",
@@ -29,6 +30,8 @@ const CompanionComponent = ({
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [messages, setMessages] = useState<SavedMessage[]>([]);
+  const { lang } = useLanguage();
+
 
   const lottieRef = useRef<LottieRefCurrentProps>(null);
 
@@ -81,24 +84,28 @@ const CompanionComponent = ({
     setIsMuted(!isMuted);
   };
   const handleCall = async (e: React.MouseEvent) => {
-    e.preventDefault(); // Prevent default form submission behavior
+  e.preventDefault();
+  try {
+    setCallStatus(CallStatus.CONNECTING);
 
-    try {
-      setCallStatus(CallStatus.CONNECTING);
+    const assistantOverrides = {
+      variableValues: { subject, topic, style },
+      clientMessages: ["transcript"],
+      serverMessages: [],
+    };
 
-      const assistantOverrides = {
-        variableValues: { subject, topic, style },
-        clientMessages: ["transcript"],
-        serverMessages: [],
-      };
+    const assistantConfig = configureAssistant(voice, style, lang);
+    console.log("assistantConfig", assistantConfig);
+    console.log("voice:", voice, "style:", style, "lang:", lang);
+    console.log("vapi:", vapi);
 
-      /* @ts-expect-error aidhi adih  */
-      await vapi.start(configureAssistant(voice, style), assistantOverrides);
-    } catch (error) {
-      console.error("Failed to start session:", error);
-      setCallStatus(CallStatus.INACTIVE);
-    }
-  };
+    /* @ts-expect-error aidhi adih */
+    await vapi.start(assistantConfig, assistantOverrides);
+  } catch (error: any) {
+    console.error("❌ Failed to start session:", error);
+    setCallStatus(CallStatus.INACTIVE);
+  }
+};
 
   const handleDisconnect = async (e: React.MouseEvent) => {
     e.preventDefault(); // Prevent default form submission behavior

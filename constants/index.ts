@@ -23,7 +23,9 @@ export function getSubjectColor(subject: string): string {
 export const voices = {
   male: { casual: "2BJW5coyhAzSr8STdHbE", formal: "c6SfcYrb2t09NHXiT80T" },
   female: { casual: "ZIlrSGI4jZqobxRKprJz", formal: "sarah" },
+  urdu: { default: "xZp4zaaBzoWhWxxrcAij" }, // <- add your Urdu voice id
 };
+
 
 export const recentSessions = [
   {

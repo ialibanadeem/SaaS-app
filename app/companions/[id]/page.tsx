@@ -1,7 +1,7 @@
 import { getCompanion } from "@/lib/actions/companion.action";
 import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
-import { getSubjectColor } from "@/lib/utils";
+import {getSubjectColor} from "@/lib/utils";
 import Image from "next/image";
 import CompanionComponent from "@/components/CompanionComponent";
 
@@ -10,7 +10,7 @@ interface CompanionSessionPageProps {
 }
 
 const CompanionSession = async ({ params }: CompanionSessionPageProps) => {
-  const { id } = params;
+  const { id } = await params;
   const companion = await getCompanion(id);
   console.log("Companion data:", companion);
   const user = await currentUser();
